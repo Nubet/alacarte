@@ -1161,13 +1161,13 @@ function OctoIntegrationForm({ settings, onChange, onFlash }: { settings: Public
           className="mt-0.5 shrink-0 focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent),0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
         />
         <div>
-          <div className="text-sm font-medium">Let octo-fiesta use ALACarte</div>
+          <div className="text-sm font-medium">Let octo-fiesta use alacarte</div>
           <div className="text-xs text-white/55 mt-0.5">
             <a href={OCTO_FIESTA_URL} target="_blank" rel="noreferrer" className="underline hover:text-white">
               filipton's octo-fiesta
             </a>{' '}
             is a Subsonic proxy for Navidrome that adds streaming catalogues to your music apps. With this on, it shows
-            Apple Music in their search and downloads through ALACarte when you play or star something.
+            Apple Music in their search and downloads through alacarte when you play or star something.
           </div>
         </div>
       </label>
@@ -1175,7 +1175,7 @@ function OctoIntegrationForm({ settings, onChange, onFlash }: { settings: Public
       {enabled && (
         <div className="space-y-3 pt-2">
           <div className="text-xs text-white/55">
-            Set these in octo-fiesta (use an ALACarte address octo-fiesta can reach). Both must mount the same music folder.
+            Set these in octo-fiesta (use an alacarte address octo-fiesta can reach). Both must mount the same music folder.
           </div>
           <pre className="overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-3 text-xs text-white/80 select-all">
 {`AppleMusic__AlacarteUrl=${alacarteUrl}

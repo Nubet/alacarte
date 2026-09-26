@@ -1,14 +1,14 @@
-# ALACarte
+# alacarte
 
 Self-hosted Apple Music downloader with a polished web UI.
 
 <div align="center">
-  <img src="./assets/hero-album.png" alt="ALACarte Album Detail View" width="100%" />
+  <img src="./assets/hero-album.png" alt="alacarte Album Detail View" width="100%" />
 </div>
 
 ## What it is
 
-ALACarte is a browser-based tool that downloads lossless audio from Apple Music, converts it to FLAC, and organizes it into a clean library structure you can point any media server at.
+alacarte is a browser-based tool that downloads lossless audio from Apple Music, converts it to FLAC, and organizes it into a clean library structure you can point any media server at.
 
 - **Search & Discover:** Full access to the Apple Music catalog (albums, artists, songs, playlists).
 - **Lossless & Hi-Res:** Download ALAC streams and auto-convert to FLAC with embedded artwork and metadata.
@@ -16,7 +16,7 @@ ALACarte is a browser-based tool that downloads lossless audio from Apple Music,
 - **Smart Queuing:** Queue individual tracks, whole albums, playlists, or bulk-select entire artist discographies (filtered by LPs/EPs/Singles).
 - **Library Awareness:** Duplicate prevention visually flags what is already in your library so you don't re-download.
 - **Explicit / clean filtering:** Apple lists explicit and clean masters as separate albums. Pick your preference in Settings (or show both) to keep search results tidy.
-- **Follow Artists:** Follow an artist to auto-download new releases as they drop. Choose to grab their current discography on follow or only watch for future releases. ALACarte checks on a self-tuning schedule (configurable in Settings) that scales with your roster size to stay well under Apple's daily API limits.
+- **Follow Artists:** Follow an artist to auto-download new releases as they drop. Choose to grab their current discography on follow or only watch for future releases. alacarte checks on a self-tuning schedule (configurable in Settings) that scales with your roster size to stay well under Apple's daily API limits.
 
 Output lands in `/music/<Artist>/<Album>/01. Track.flac` (or `/music/<Artist>/Singles/` for individual songs). Playlist downloads are merged into the same artist/album library structure and also emit `/music/Playlists/<Playlist>.m3u8` with relative paths so Jellyfin/Navidrome can import playlist order.
 
@@ -75,7 +75,7 @@ No manual data migration is required for `data/web/settings.json` or existing en
 
 ## Security
 
-ALACarte ships with a built-in single-password gate. The first time you visit the UI, you'll be prompted to set a username/password and the one-time setup token from server logs — every API endpoint and page is then locked behind it.
+alacarte ships with a built-in single-password gate. The first time you visit the UI, you'll be prompted to set a username/password and the one-time setup token from server logs — every API endpoint and page is then locked behind it.
 
 A few things to keep in mind:
 
@@ -92,7 +92,7 @@ A few things to keep in mind:
 
 ## First login flow
 
-ALACarte needs to authenticate with Apple to obtain decryption tokens. This happens once, then the session persists across container restarts.
+alacarte needs to authenticate with Apple to obtain decryption tokens. This happens once, then the session persists across container restarts.
 
 1. Enter your credentials in Settings and click Save.
 2. If Apple requires 2FA, you'll see a prompt asking for the 6-digit code. If a trusted device only shows Allow / Not Me, generate a code from Settings → Apple ID → Sign-In & Security → Get Verification Code.
@@ -133,13 +133,13 @@ Wrapper response type 4 is a generic StoreServices failure, not a credential dia
 - If your host's `/tmp` is tmpfs (RAM-backed), large downloads can exhaust memory. Either bind-mount a disk path to `/tmp/alacarte-staging` in your compose override, or toggle "Store temp staging inside music library" on.
 - If you intentionally point staging inside your music library, configure your scanner to ignore hidden directories.
 
-**Sharing a network with Jellyfin/Plex/etc.** By default ALACarte creates its own `alacarte-net` Docker network. If you'd rather attach to an existing network (e.g. the one your media server already uses), set `DOCKER_NETWORK=<name>` and `DOCKER_NETWORK_EXTERNAL=true` in `.env`.
+**Sharing a network with Jellyfin/Plex/etc.** By default alacarte creates its own `alacarte-net` Docker network. If you'd rather attach to an existing network (e.g. the one your media server already uses), set `DOCKER_NETWORK=<name>` and `DOCKER_NETWORK_EXTERNAL=true` in `.env`.
 
 **Local compose tweaks** If you need to change things the `.env` variables don't cover (extra volumes, additional environment, etc.), drop a `docker-compose.override.yml` next to the main compose file. Docker Compose auto-merges it and it's gitignored, so you can run `docker compose up` normally without polluting the committed config.
 
-**Navidrome Integration** ALACarte includes built-in support for triggering Subsonic API scans in Navidrome. Once you configure your Navidrome credentials in the Settings panel, ALACarte will instantly instruct your server to quick-scan the library the exact moment a download completes. No more waiting for hourly cron jobs!
+**Navidrome Integration** alacarte includes built-in support for triggering Subsonic API scans in Navidrome. Once you configure your Navidrome credentials in the Settings panel, alacarte will instantly instruct your server to quick-scan the library the exact moment a download completes. No more waiting for hourly cron jobs!
 
-**Apple Music in Subsonic clients (octo-fiesta)** [filipton's octo-fiesta](https://github.com/filipton/octo-fiesta) is a Subsonic proxy for Navidrome that adds streaming catalogues to your music apps' search and downloads what you play. It can use ALACarte for Apple Music: turn on **Settings → octo-fiesta Integration**, then give octo-fiesta the `AppleMusic__AlacarteUrl` and `AppleMusic__ApiToken` shown there. Both must mount the same music folder. The token only opens `/api/integration/v1`, and the integration stays off until you turn it on.
+**Apple Music in Subsonic clients (octo-fiesta)** [filipton's octo-fiesta](https://github.com/filipton/octo-fiesta) is a Subsonic proxy for Navidrome that adds streaming catalogues to your music apps' search and downloads what you play. It can use alacarte for Apple Music: turn on **Settings → octo-fiesta Integration**, then give octo-fiesta the `AppleMusic__AlacarteUrl` and `AppleMusic__ApiToken` shown there. Both must mount the same music folder. The token only opens `/api/integration/v1`, and the integration stays off until you turn it on.
 
 ## Troubleshooting
 
@@ -153,7 +153,7 @@ Wrapper response type 4 is a generic StoreServices failure, not a credential dia
 
 ## Architecture
 
-ALACarte runs on a shared Docker network with three primary components:
+alacarte runs on a shared Docker network with three primary components:
 - **web:** This repository. It wraps the downloader CLI as a child process and serves the React SPA on port `7373`.
 - **amdp:** The underlying downloader binary, included at build time.
 - **wrapper:** A FairPlay decryption daemon that handles the DRM removal, included at build time.
