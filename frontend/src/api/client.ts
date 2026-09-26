@@ -195,6 +195,8 @@ export type PublicSettings = {
   navidromeUrl: string
   navidromeUser: string | null
   hasNavidromeCreds: boolean
+  octoIntegrationEnabled: boolean
+  hasOctoIntegrationToken: boolean
   autoDownloadsEnabled: boolean
   autoDownloadCheckFrequency: AutoCheckFrequency
   stagingInsideMusicLibrary: boolean
@@ -527,6 +529,10 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(patch),
     }),
+  octoIntegrationToken: () =>
+    http<{ token: string | null }>('/api/settings/octo-integration/token'),
+  regenerateOctoIntegrationToken: () =>
+    http<{ token: string }>('/api/settings/octo-integration/token', { method: 'POST' }),
   saveAppleCreds: (email: string, password: string, autoLogin = true) =>
     http<{
       ok: boolean

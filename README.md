@@ -139,6 +139,8 @@ Wrapper response type 4 is a generic StoreServices failure, not a credential dia
 
 **Navidrome Integration** ALACarte includes built-in support for triggering Subsonic API scans in Navidrome. Once you configure your Navidrome credentials in the Settings panel, ALACarte will instantly instruct your server to quick-scan the library the exact moment a download completes. No more waiting for hourly cron jobs!
 
+**Apple Music in Subsonic clients (octo-fiesta)** [filipton's octo-fiesta](https://github.com/filipton/octo-fiesta) is a Subsonic proxy for Navidrome that adds streaming catalogues to your music apps' search and downloads what you play. It can use ALACarte for Apple Music: turn on **Settings → octo-fiesta Integration**, then give octo-fiesta the `AppleMusic__AlacarteUrl` and `AppleMusic__ApiToken` shown there. Both must mount the same music folder. The token only opens `/api/integration/v1`, and the integration stays off until you turn it on.
+
 ## Troubleshooting
 
 | Problem | Likely cause | Fix |
