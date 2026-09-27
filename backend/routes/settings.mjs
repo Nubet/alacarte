@@ -11,6 +11,12 @@ import {
   decryptSecret,
 } from '../lib/settingsStore.mjs'
 import {
+  UI_LANGUAGE_VALUES,
+  ACCEPTED_LANGUAGE_VALUES,
+  NAMING_LANGUAGE_MODE_VALUES,
+  MAX_ACCEPTED_LANGUAGES,
+} from '../lib/metadataLanguage.mjs'
+import {
   startWrapperLogin,
   submit2FA,
   cancelLogin,
@@ -20,6 +26,7 @@ import {
   getHardBlock,
 } from '../lib/wrapperLogin.mjs'
 import { generateIntegrationToken } from '../lib/apiToken.mjs'
+import { storefrontList } from '../lib/storefrontList.mjs'
 import {
   startTagBackfill,
   getTagBackfillStatus,
@@ -54,6 +61,9 @@ export const WRITABLE_KEYS = new Set([
   'namingConvention',
   'versionOptionsEnabled',
   'versionOptions',
+  'uiLanguage',
+  'acceptedLanguages',
+  'namingLanguageMode',
   ])
 
 const EXPLICIT_FILTER_VALUES = new Set(['explicit', 'clean', 'both'])
@@ -67,6 +77,14 @@ settingsRouter.get('/', async (_req, res) => {
     res.json({ ...base, hardBlockReason: getHardBlock() || null })
   } catch (err) {
     res.status(500).json({ error: err.message })
+  }
+})
+
+settingsRouter.get('/storefronts', async (req, res) => {
+  try {
+    res.json({ storefronts: await storefrontList(req.query.lang) })
+  } catch (err) {
+    res.status(502).json({ error: err.message })
   }
 })
 
@@ -85,6 +103,21 @@ settingsRouter.put('/', async (req, res) => {
       if (k === 'octoIntegrationEnabled' && typeof v !== 'boolean') continue
       if (k === 'versionOptions' && !Array.isArray(v)) continue
       if (k === 'autoDownloadCheckFrequency' && !AUTO_DOWNLOAD_FREQUENCY_VALUES.has(v)) continue
+      if (k === 'uiLanguage' && !UI_LANGUAGE_VALUES.has(v)) continue
+      if (k === 'namingLanguageMode' && !NAMING_LANGUAGE_MODE_VALUES.has(v)) continue
+      if (k === 'acceptedLanguages') {
+        if (!Array.isArray(v)) continue
+        const seen = new Set()
+        patch[k] = v
+          .map((x) => String(x || '').trim().toLowerCase())
+          .filter((code) => {
+            if (!ACCEPTED_LANGUAGE_VALUES.has(code) || seen.has(code)) return false
+            seen.add(code)
+            return true
+          })
+          .slice(0, MAX_ACCEPTED_LANGUAGES)
+        continue
+      }
       if (k === 'navidromePassword') {
         if (v) {
           patch[k] = encryptSecret(v)

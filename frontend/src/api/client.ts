@@ -206,7 +206,13 @@ export type PublicSettings = {
   namingConvention: 'apple' | 'qobuz'
   versionOptionsEnabled: boolean
   versionOptions: QualityGroup[]
+  uiLanguage: UiLanguage
+  acceptedLanguages: string[]
+  namingLanguageMode: NamingLanguageMode
 }
+
+export type UiLanguage = 'system' | 'en' | 'zh' | 'zh-hant' | 'ja' | 'ko' | 'es' | 'fr'
+export type NamingLanguageMode = 'display' | 'original-if-accepted' | 'dual'
 
 export type AutoCheckFrequency =
   | 'auto'
@@ -532,6 +538,10 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(patch),
     }),
+  storefronts: (lang: string) =>
+    http<{ storefronts: Array<{ id: string; name: string }> }>(
+      `/api/settings/storefronts?lang=${encodeURIComponent(lang)}`,
+    ),
   octoIntegrationToken: () =>
     http<{ token: string | null }>('/api/settings/octo-integration/token'),
   regenerateOctoIntegrationToken: () =>

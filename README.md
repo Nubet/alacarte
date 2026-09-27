@@ -119,6 +119,18 @@ Wrapper response type 4 is a generic StoreServices failure, not a credential dia
 - The queue survives page refreshes but not container restarts.
 - If a job fails (network hiccup, decryption glitch), you can re-queue it manually.
 
+## Language support
+
+- **Language** (Settings → Catalog) sets the language of the UI: English, Chinese (Simplified or Traditional), Japanese, Korean, Spanish or French. "Follow system default" uses your browser's language and falls back to English.
+- **Naming language** (Settings → Library output) decides which language song, album and artist names are saved in:
+  - **Display** (default): the names shown in your catalog language, exactly as before.
+  - **Original if accepted**: the original-language name when its language is in your accepted list, e.g. `泡沫` instead of `Bubbles`.
+  - **Dual**: both, e.g. `Bubbles (泡沫)`.
+
+  When an original name differs, FLAC files also get `ORIGINAL_TITLE`, `ORIGINAL_ALBUM` and `ORIGINAL_ARTIST` tags.
+
+The "original" name is what Apple shows in your storefront's own language, so the naming modes only change anything when that differs from your catalog language (for example a Japanese storefront with English as the catalog language). Original-if-accepted recognises Chinese, Japanese and Korean names. A naming mode adds one cached Apple request per album, and playlist and "fill missing tracks" downloads keep display names.
+
 ## Notes and limits
 
 **IP rate-limiting and proxies** Apple appears to rate-limit by IP if you query huge amounts of data at once. In my experience, this isn't a permanent ban, I got soft-blocked for about a day after downloading ~1500 songs. If you plan to archive massive collections, consider:
