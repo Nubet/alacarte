@@ -145,6 +145,7 @@ export type Job = {
   quality?: QualityPreference
   variant?: QualityGroup | null
   stats?: { total?: number; done?: number; failed?: number; converted?: number }
+  queueSeq?: number
 }
 
 export type QualityPreference = 'flac' | 'alac' | 'atmos' | 'aac'
@@ -731,7 +732,11 @@ export const api = {
       `/api/playlist-following/${encodeURIComponent(id)}/download-missing`,
       { method: 'POST', body: JSON.stringify({ quality }) },
     ),
-  queue: () => http<{ jobs: Job[] }>('/api/queue'),
+  queue: () => http<{ jobs: Job[]; paused: boolean }>('/api/queue'),
+  reorderQueue: (ids: string[]) =>
+    http<{ order: string[] }>('/api/queue/order', { method: 'PUT', body: JSON.stringify({ ids }) }),
+  pauseQueue: () => http<{ paused: boolean }>('/api/queue/pause', { method: 'POST' }),
+  resumeQueue: () => http<{ paused: boolean }>('/api/queue/resume', { method: 'POST' }),
   library: () =>
     http<{
       albums: LibraryAlbum[]

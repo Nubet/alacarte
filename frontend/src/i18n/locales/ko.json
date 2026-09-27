@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "{{format}} 버전",
     "cancelled": "취소됨",
-    "cancel": "취소"
+    "cancel": "취소",
+    "moveToTop": "맨 위로 이동",
+    "dragToReorder": "드래그하여 순서 변경"
   },
   "healthPill": {
     "checking": "확인 중…",
@@ -501,7 +503,10 @@
     "activeCount": "진행 중 ({{count}})",
     "nothingActive": "진행 중인 항목이 없습니다.",
     "historyCount": "기록 ({{count}})",
-    "noCompletedDownloads": "아직 완료된 다운로드가 없습니다."
+    "noCompletedDownloads": "아직 완료된 다운로드가 없습니다.",
+    "pause": "대기열 일시정지",
+    "resume": "대기열 재개",
+    "pausedNotice": "대기열이 일시정지되었습니다. 현재 다운로드는 끝까지 진행되고, 재개할 때까지 새 다운로드는 시작되지 않습니다."
   },
   "cloudLibrary": {
     "albumsLower": "앨범",

@@ -16,6 +16,7 @@ const EVENT_TYPES = [
   'job.created',
   'job.update',
   'job.log',
+  'queue.state',
   'wrapper.login',
   'wrapper.login.log',
   'wrapper.health',

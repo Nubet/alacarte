@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "{{format}} version",
     "cancelled": "Cancelled",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "moveToTop": "Move to top",
+    "dragToReorder": "Drag to reorder"
   },
   "healthPill": {
     "checking": "Checking…",
@@ -501,7 +503,10 @@
     "activeCount": "Active ({{count}})",
     "nothingActive": "Nothing active.",
     "historyCount": "History ({{count}})",
-    "noCompletedDownloads": "No completed downloads yet."
+    "noCompletedDownloads": "No completed downloads yet.",
+    "pause": "Pause queue",
+    "resume": "Resume queue",
+    "pausedNotice": "Queue paused. The current download finishes, nothing new starts until you resume."
   },
   "cloudLibrary": {
     "albumsLower": "albums",

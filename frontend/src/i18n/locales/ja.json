@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "{{format}} 版",
     "cancelled": "キャンセル済み",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "moveToTop": "先頭へ移動",
+    "dragToReorder": "ドラッグして並べ替え"
   },
   "healthPill": {
     "checking": "確認しています…",
@@ -501,7 +503,10 @@
     "activeCount": "アクティブ（{{count}}）",
     "nothingActive": "アクティブな項目はありません。",
     "historyCount": "履歴（{{count}}）",
-    "noCompletedDownloads": "完了したダウンロードはまだありません。"
+    "noCompletedDownloads": "完了したダウンロードはまだありません。",
+    "pause": "キューを一時停止",
+    "resume": "キューを再開",
+    "pausedNotice": "キューは一時停止中です。現在のダウンロードは完了し、再開するまで新しいダウンロードは始まりません。"
   },
   "cloudLibrary": {
     "albumsLower": "アルバム",

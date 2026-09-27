@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "Version {{format}}",
     "cancelled": "Annulé",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "moveToTop": "Placer en tête",
+    "dragToReorder": "Glisser pour réordonner"
   },
   "healthPill": {
     "checking": "Vérification…",
@@ -501,7 +503,10 @@
     "activeCount": "Actifs ({{count}})",
     "nothingActive": "Rien d'actif.",
     "historyCount": "Historique ({{count}})",
-    "noCompletedDownloads": "Aucun téléchargement terminé pour le moment."
+    "noCompletedDownloads": "Aucun téléchargement terminé pour le moment.",
+    "pause": "Mettre la file en pause",
+    "resume": "Reprendre la file",
+    "pausedNotice": "File en pause. Le téléchargement en cours se termine, rien de nouveau ne démarre tant que vous ne reprenez pas."
   },
   "cloudLibrary": {
     "albumsLower": "albums",

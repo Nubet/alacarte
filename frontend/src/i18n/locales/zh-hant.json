@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "{{format}} 版本",
     "cancelled": "已取消",
-    "cancel": "取消"
+    "cancel": "取消",
+    "moveToTop": "移到頂端",
+    "dragToReorder": "拖曳以排序"
   },
   "healthPill": {
     "checking": "檢查中…",
@@ -501,7 +503,10 @@
     "activeCount": "進行中（{{count}}）",
     "nothingActive": "目前沒有進行中的項目。",
     "historyCount": "紀錄（{{count}}）",
-    "noCompletedDownloads": "尚無已完成的下載。"
+    "noCompletedDownloads": "尚無已完成的下載。",
+    "pause": "暫停佇列",
+    "resume": "繼續佇列",
+    "pausedNotice": "佇列已暫停。目前的下載會完成，恢復前不會開始新的下載。"
   },
   "cloudLibrary": {
     "albumsLower": "專輯",

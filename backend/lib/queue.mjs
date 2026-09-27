@@ -36,7 +36,7 @@ import {
 } from './folderLayout.mjs'
 import { findSongPathInLibrary, getAlbumTrackPresence, getAlbumVersionGroups, hasSongInLibrary, invalidateLibraryCache, isPlaylistInLibrary, songNameFromFilename, stripTrailingYear } from './libraryIndex.mjs'
 import { writePlaylistM3U } from './playlistExport.mjs'
-import { getDb } from './db.mjs'
+import { getDb, getMeta, setMeta } from './db.mjs'
 import { normalizeForMatchKey } from './libraryMatchKey.mjs'
 import { readAudioMetaTags, writeAudioIdentityTags } from './audioTags.mjs'
 import { probeWrapperPorts } from './wrapperHealth.mjs'
@@ -83,6 +83,55 @@ const state = {
   queue: [], // job ids
   active: new Set(),
   running: new Map(), // id -> abortController
+  paused: false,
+}
+
+const QUEUE_PAUSED_KEY = 'queue_paused'
+
+// Queued jobs run in queueSeq order (creation time until reordered), which
+// is also the seq persisted for restarts.
+function queueSeq(job) {
+  return job?.queueSeq ?? job?.createdAt ?? 0
+}
+
+export function getQueueState() {
+  return { paused: state.paused }
+}
+
+// Pausing only stops new jobs from starting; the running one finishes.
+export function setQueuePaused(paused) {
+  state.paused = Boolean(paused)
+  try {
+    setMeta(QUEUE_PAUSED_KEY, state.paused ? '1' : '0')
+  } catch (err) {
+    console.error('queue pause persist failed:', err.message)
+  }
+  emitEvent('queue.state', getQueueState())
+  if (!state.paused) setImmediate(tickQueue)
+  return getQueueState()
+}
+
+// Puts the listed queued jobs first, in the given order; queued jobs that
+// were not listed keep their relative order after them. The existing seq
+// values are reused so new jobs still land at the end.
+export function reorderQueue(ids) {
+  const queued = new Set(state.queue)
+  const wanted = [...new Set((Array.isArray(ids) ? ids : []).filter((id) => queued.has(id)))]
+  const listed = new Set(wanted)
+  const next = [...wanted, ...state.queue.filter((id) => !listed.has(id))]
+  const seqs = next.map((id) => queueSeq(state.jobs.get(id))).sort((a, b) => a - b)
+  for (let i = 1; i < seqs.length; i++) {
+    if (seqs[i] <= seqs[i - 1]) seqs[i] = seqs[i - 1] + 1
+  }
+  state.queue = next
+  next.forEach((id, i) => {
+    const j = state.jobs.get(id)
+    if (j && queueSeq(j) !== seqs[i]) {
+      updateJob(id, { queueSeq: seqs[i] })
+      persistJob(j, true)
+    }
+  })
+  return next
 }
 
 function createProgressState(job, { convertEnabled }) {
@@ -373,10 +422,11 @@ function persistJob(job, force = false) {
       `INSERT INTO queue_jobs (id, seq, status, payload, updated_at)
        VALUES (?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
+         seq = excluded.seq,
          status = excluded.status,
          payload = excluded.payload,
          updated_at = excluded.updated_at`,
-    ).run(job.id, job.createdAt || 0, job.status, JSON.stringify(job), now)
+    ).run(job.id, queueSeq(job), job.status, JSON.stringify(job), now)
     if (force && (job.status === 'done' || job.status === 'failed')) {
       db.prepare(
         `DELETE FROM queue_jobs WHERE id IN (
@@ -424,6 +474,7 @@ function jobPublic(j) {
     stats: j.stats,
     quality: j.quality,
     variant: j.variant || null,
+    queueSeq: queueSeq(j),
   }
 }
 
@@ -1030,6 +1081,9 @@ export async function initQueue() {
   } catch (err) {
     console.error('history import failed:', err.message)
   }
+  try {
+    state.paused = getMeta(QUEUE_PAUSED_KEY) === '1'
+  } catch {}
   restorePersistedJobs()
   setImmediate(tickQueue)
 }
@@ -1051,6 +1105,7 @@ export const __test__ = {
   createProgressState,
   state,
   wakeAndWaitForWrapper,
+  tickQueue,
 }
 
 // Stamp ISRC/BARCODE tags onto downloaded FLACs so presence matching has an
@@ -1141,7 +1196,7 @@ async function cleanupStaleStagingDirs(stagingRoot) {
 }
 
 async function tickQueue() {
-  while (state.active.size < MAX_CONCURRENT && state.queue.length > 0) {
+  while (!state.paused && state.active.size < MAX_CONCURRENT && state.queue.length > 0) {
     const id = state.queue.shift()
     const job = state.jobs.get(id)
     if (!job || job.status !== 'queued') continue

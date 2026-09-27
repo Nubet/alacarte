@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "{{format}} 版本",
     "cancelled": "已取消",
-    "cancel": "取消"
+    "cancel": "取消",
+    "moveToTop": "移到顶部",
+    "dragToReorder": "拖动以排序"
   },
   "healthPill": {
     "checking": "正在检查…",
@@ -501,7 +503,10 @@
     "activeCount": "进行中（{{count}}）",
     "nothingActive": "当前没有进行中的任务。",
     "historyCount": "历史（{{count}}）",
-    "noCompletedDownloads": "尚无已完成的下载。"
+    "noCompletedDownloads": "尚无已完成的下载。",
+    "pause": "暂停队列",
+    "resume": "继续队列",
+    "pausedNotice": "队列已暂停。当前下载会完成，恢复前不会开始新的下载。"
   },
   "cloudLibrary": {
     "albumsLower": "专辑",

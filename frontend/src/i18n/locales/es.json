@@ -390,7 +390,9 @@
   "queueItem": {
     "version": "Versión {{format}}",
     "cancelled": "Cancelado",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "moveToTop": "Mover arriba del todo",
+    "dragToReorder": "Arrastra para reordenar"
   },
   "healthPill": {
     "checking": "Comprobando…",
@@ -501,7 +503,10 @@
     "activeCount": "Activas ({{count}})",
     "nothingActive": "No hay nada activo.",
     "historyCount": "Historial ({{count}})",
-    "noCompletedDownloads": "Aún no hay descargas completadas."
+    "noCompletedDownloads": "Aún no hay descargas completadas.",
+    "pause": "Pausar cola",
+    "resume": "Reanudar cola",
+    "pausedNotice": "Cola en pausa. La descarga actual termina y no empieza ninguna nueva hasta que la reanudes."
   },
   "cloudLibrary": {
     "albumsLower": "álbumes",
