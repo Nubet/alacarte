@@ -16,6 +16,7 @@ import {
   Tags,
   User as UserIcon,
   Users,
+  Wrench,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -396,6 +397,32 @@ export function SettingsPage() {
                 </div>
               </label>
 
+              <label className="flex flex-col gap-1.5 md:flex-row md:items-start md:gap-3">
+                <span className="text-sm text-white/70 md:w-32 md:pt-2">
+                  {t('settings.namingLanguageMode')}
+                </span>
+                <div className="md:flex-1">
+                  <select
+                    value={settings.namingLanguageMode}
+                    onChange={(e) =>
+                      update({
+                        namingLanguageMode: e.target.value as PublicSettings['namingLanguageMode'],
+                      })
+                    }
+                    className="w-full rounded-app border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white outline-none transition-[border-color,background,box-shadow] duration-[250ms] ease-smooth focus:border-[rgba(var(--accent),0.45)] focus:bg-[rgba(var(--accent),0.04)] focus:shadow-[0_0_0_3px_rgba(var(--accent),0.18)]"
+                  >
+                    {NAMING_LANGUAGE_MODE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value} className="bg-zinc-900">
+                        {t(option.labelKey)}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="mt-1.5 text-[13px] text-white/45">
+                    {t(`${NAMING_LANGUAGE_MODE_OPTIONS.find((o) => o.value === settings.namingLanguageMode)?.labelKey ?? 'settings.namingModeDisplay'}Help`)}
+                  </div>
+                </div>
+              </label>
+
               <div className="border-t border-white/[0.06] pt-4">
                 <div className="text-sm text-white/70">{t('settings.acceptedLanguages')}</div>
                 <div className="mt-1 text-[13px] text-white/45">{t('settings.acceptedLanguagesHelp')}</div>
@@ -407,27 +434,6 @@ export function SettingsPage() {
                     placeholder={t('settings.acceptedLanguagesPlaceholder')}
                     emptyHint={t('settings.acceptedLanguagesEmpty')}
                   />
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-medium">{t('settings.namingLanguageMode')}</div>
-                <div className="mt-2 space-y-2" role="radiogroup" aria-label={t('settings.namingLanguageMode')}>
-                  {NAMING_LANGUAGE_MODE_OPTIONS.map((option) => (
-                    <label
-                      key={option.value}
-                      className="flex cursor-pointer items-start gap-3 rounded-app border border-white/[0.06] bg-white/[0.02] p-3 hover:bg-white/[0.04]"
-                    >
-                      <input
-                        type="radio"
-                        name="namingLanguageMode"
-                        checked={settings.namingLanguageMode === option.value}
-                        onChange={() => update({ namingLanguageMode: option.value })}
-                        className="mt-0.5 shrink-0"
-                      />
-                      <span className="text-[13px] text-white/80">{t(option.labelKey)}</span>
-                    </label>
-                  ))}
                 </div>
               </div>
             </div>
@@ -542,15 +548,17 @@ export function SettingsPage() {
         </StaggeredItem>
 
         <StaggeredItem>
-          <TagBackfillCard flash={flash} />
-        </StaggeredItem>
-
-        <StaggeredItem>
-          <LyricsBackfillCard flash={flash} />
-        </StaggeredItem>
-
-        <StaggeredItem>
-          <ArtistBackfillCard flash={flash} />
+          <SettingsCard icon={<Wrench className="h-4 w-4" />} title={t('settings.cardLibraryMaintenance')}>
+            <div className="space-y-5">
+              <TagBackfillCard flash={flash} />
+              <div className="border-t border-white/[0.06] pt-5">
+                <LyricsBackfillCard flash={flash} />
+              </div>
+              <div className="border-t border-white/[0.06] pt-5">
+                <ArtistBackfillCard flash={flash} />
+              </div>
+            </div>
+          </SettingsCard>
         </StaggeredItem>
 
         <StaggeredItem>
@@ -1674,9 +1682,15 @@ function BackfillCard<S extends BackfillStatusBase>({
       : 0
 
   return (
-    <SettingsCard icon={<Icon className="h-4 w-4" />} title={title}>
-      <div className="space-y-4">
-        <div className="text-sm text-white/55">{description}</div>
+    <section>
+      <div className="space-y-3">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Icon className="h-4 w-4 text-white/55" />
+            {title}
+          </div>
+          <div className="mt-1 text-[13px] text-white/50">{description}</div>
+        </div>
 
         {running && (
           <div className="space-y-2">
@@ -1761,7 +1775,7 @@ function BackfillCard<S extends BackfillStatusBase>({
           </div>
         </div>
       </Modal>
-    </SettingsCard>
+    </section>
   )
 }
 
