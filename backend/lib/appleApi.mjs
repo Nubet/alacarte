@@ -73,8 +73,9 @@ export async function listStorefronts(language = 'en-US') {
   return out
 }
 
-export async function getSongsByIsrc({ storefront, isrcs, language = 'en-US' }) {
+export async function getSongsByIsrc({ storefront, isrcs, language = 'en-US', include }) {
   const qs = new URLSearchParams({ 'filter[isrc]': isrcs.join(','), l: language })
+  if (include) qs.set('include', include)
   return apiGet(`${BASE}/${encodeURIComponent(storefront)}/songs?${qs.toString()}`, { language })
 }
 
@@ -91,6 +92,12 @@ export async function getSongLyricsTtml({ storefront, id, language = 'en-US', me
     if (/Apple API 404/.test(err.message)) return null
     throw err
   }
+}
+
+export async function getAlbumsByUpc({ storefront, upcs, language = 'en-US', include }) {
+  const qs = new URLSearchParams({ 'filter[upc]': upcs.join(','), l: language })
+  if (include) qs.set('include', include)
+  return apiGet(`${BASE}/${encodeURIComponent(storefront)}/albums?${qs.toString()}`, { language })
 }
 
 export async function getAlbum({ storefront, id, language = 'en-US' }) {

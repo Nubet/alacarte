@@ -213,7 +213,15 @@
     "lyricsAddedCount": "{{count}} added",
     "lastRunLyricsAdded": "Last run: {{count}} added",
     "alreadyHaveLyricsCount": "{{count}} already have lyrics",
-    "noAppleLyricsCount": "{{count}} without lyrics on Apple"
+    "noAppleLyricsCount": "{{count}} without lyrics on Apple",
+    "cardArtistCredits": "Artist credits",
+    "artistBackfillDescription": "Songs with several artists are tagged with one combined name like \"Charli xcx & Billie Eilish\", which media servers show as a separate artist. This writes each artist and composer from Apple Music as its own tag (ARTISTS, COMPOSER, ALBUMARTISTS) and keeps the display name. New downloads get this automatically. When it finishes, a full Navidrome scan runs so the combined artists disappear.",
+    "backfillArtists": "Fix artist credits",
+    "scanLibraryForArtistCredits": "Rewrite artist credits across your library?",
+    "artistBackfillStarted": "Artist credit fix started",
+    "artistsUpdatedCount": "{{count}} updated",
+    "lastRunArtistsUpdated": "Last run: {{count}} updated",
+    "alreadyCorrectCount": "{{count}} already correct"
   },
   "album": {
     "loadError": "Failed to load",

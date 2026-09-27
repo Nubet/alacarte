@@ -37,6 +37,11 @@ import {
   getLyricsBackfillStatus,
   stopLyricsBackfill,
 } from '../lib/lyricsBackfill.mjs'
+import {
+  startArtistBackfill,
+  getArtistBackfillStatus,
+  stopArtistBackfill,
+} from '../lib/artistCredits.mjs'
 
 export const settingsRouter = express.Router()
 
@@ -306,4 +311,20 @@ settingsRouter.post('/lyrics-backfill', async (_req, res) => {
 
 settingsRouter.post('/lyrics-backfill/stop', (_req, res) => {
   res.json(stopLyricsBackfill())
+})
+
+settingsRouter.get('/artist-backfill', (_req, res) => {
+  res.json(getArtistBackfillStatus())
+})
+
+settingsRouter.post('/artist-backfill', async (_req, res) => {
+  try {
+    res.json(await startArtistBackfill())
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ error: err.message })
+  }
+})
+
+settingsRouter.post('/artist-backfill/stop', (_req, res) => {
+  res.json(stopArtistBackfill())
 })

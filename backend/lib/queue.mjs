@@ -18,6 +18,7 @@ import {
 } from './appleApi.mjs'
 import { getLibraryPlaylistDetail } from './appleLibraryApi.mjs'
 import { triggerNavidromeScan } from './navidromeApi.mjs'
+import { creditImportedFiles } from './artistCredits.mjs'
 import { writeAmdpConfig, spawnAmdp, stripAnsi } from './amdpRunner.mjs'
 import { applyVariantSuffix, groupOf } from './qualityGroups.mjs'
 import {
@@ -1486,6 +1487,7 @@ async function runJob(job) {
         finalDir: path.dirname(playlistPath),
       })
       await appendHistory(job)
+      await creditImportedFiles(importedTracks)
       triggerNavidromeScan().catch(console.error)
       return
     }
@@ -1703,6 +1705,7 @@ async function runJob(job) {
     })
     invalidateLibraryCache()
     await appendHistory(job)
+    await creditImportedFiles([finalDir])
     triggerNavidromeScan().catch(console.error)
   } catch (err) {
     if (err.name === 'AbortError') {
@@ -1993,6 +1996,7 @@ async function runPartialAlbumFill({
   })
   invalidateLibraryCache()
   await appendHistory(job)
+  await creditImportedFiles(trackAlbumPaths)
   triggerNavidromeScan().catch(console.error)
 }
 
@@ -2160,6 +2164,7 @@ async function runLibraryPlaylistFill({
   })
   invalidateLibraryCache()
   await appendHistory(job)
+  await creditImportedFiles(importedPaths)
   triggerNavidromeScan().catch(console.error)
 }
 

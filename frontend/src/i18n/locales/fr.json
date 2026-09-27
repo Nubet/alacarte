@@ -213,7 +213,15 @@
     "lyricsAddedCount": "{{count}} ajoutées",
     "lastRunLyricsAdded": "Dernière exécution : {{count}} ajoutées",
     "alreadyHaveLyricsCount": "{{count}} ont déjà des paroles",
-    "noAppleLyricsCount": "{{count}} sans paroles sur Apple"
+    "noAppleLyricsCount": "{{count}} sans paroles sur Apple",
+    "cardArtistCredits": "Crédits des artistes",
+    "artistBackfillDescription": "Les morceaux à plusieurs artistes sont tagués avec un nom combiné comme « Charli xcx & Billie Eilish », que les serveurs multimédias affichent comme un artiste à part. Ceci écrit chaque artiste et compositeur d'Apple Music dans son propre tag (ARTISTS, COMPOSER, ALBUMARTISTS) et garde le nom affiché. Les nouveaux téléchargements le font automatiquement. À la fin, un scan complet de Navidrome fait disparaître les artistes combinés.",
+    "backfillArtists": "Corriger les crédits des artistes",
+    "scanLibraryForArtistCredits": "Réécrire les crédits des artistes de votre bibliothèque ?",
+    "artistBackfillStarted": "Correction des crédits lancée",
+    "artistsUpdatedCount": "{{count}} mis à jour",
+    "lastRunArtistsUpdated": "Dernière exécution : {{count}} mis à jour",
+    "alreadyCorrectCount": "{{count}} déjà corrects"
   },
   "album": {
     "loadError": "Échec du chargement",

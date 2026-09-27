@@ -421,6 +421,21 @@ export type LyricsBackfillStatus = {
   error: string | null
 }
 
+export type ArtistBackfillStatus = {
+  running: boolean
+  scanned: number
+  total: number
+  updated: number
+  skipped: number
+  noMatch: number
+  failed: number
+  current: string | null
+  startedAt: number | null
+  finishedAt: number | null
+  stopRequested: boolean
+  error: string | null
+}
+
 type UnauthorizedHandler = (info: { needsSetup: boolean }) => void
 
 let onUnauthorized: UnauthorizedHandler | null = null
@@ -855,6 +870,11 @@ export const api = {
     http<LyricsBackfillStatus>('/api/settings/lyrics-backfill', { method: 'POST' }),
   stopLyricsBackfill: () =>
     http<{ ok: boolean }>('/api/settings/lyrics-backfill/stop', { method: 'POST' }),
+  artistBackfillStatus: () => http<ArtistBackfillStatus>('/api/settings/artist-backfill'),
+  startArtistBackfill: () =>
+    http<ArtistBackfillStatus>('/api/settings/artist-backfill', { method: 'POST' }),
+  stopArtistBackfill: () =>
+    http<{ ok: boolean }>('/api/settings/artist-backfill/stop', { method: 'POST' }),
 }
 
 export function artworkUrl(

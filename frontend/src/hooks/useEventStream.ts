@@ -30,6 +30,7 @@ const EVENT_TYPES = [
   'cloud-library.download-all.progress',
   'tags.backfill.progress',
   'lyrics.backfill.progress',
+  'artists.backfill.progress',
   'library.changed',
 ] as const
 

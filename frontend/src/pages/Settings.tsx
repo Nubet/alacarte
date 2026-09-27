@@ -15,12 +15,14 @@ import {
   ShieldCheck,
   Tags,
   User as UserIcon,
+  Users,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
 import {
   api,
+  type ArtistBackfillStatus,
   type EffectiveCheckInterval,
   type LyricsBackfillStatus,
   type PublicSettings,
@@ -545,6 +547,10 @@ export function SettingsPage() {
 
         <StaggeredItem>
           <LyricsBackfillCard flash={flash} />
+        </StaggeredItem>
+
+        <StaggeredItem>
+          <ArtistBackfillCard flash={flash} />
         </StaggeredItem>
 
         <StaggeredItem>
@@ -1812,6 +1818,36 @@ function LyricsBackfillCard({ flash }: { flash: (msg: string) => void }) {
           </Badge>
           <Badge>{t('settings.alreadyHaveLyricsCount', { count: s.skipped })}</Badge>
           <Badge>{t('settings.noAppleLyricsCount', { count: s.noLyrics })}</Badge>
+          <Badge variant="warn">{t('settings.unmatchedCount', { count: s.noMatch })}</Badge>
+          {s.failed > 0 && <Badge variant="bad">{t('settings.failedCount', { count: s.failed })}</Badge>}
+        </>
+      )}
+    />
+  )
+}
+
+function ArtistBackfillCard({ flash }: { flash: (msg: string) => void }) {
+  const { t } = useTranslation()
+  return (
+    <BackfillCard<ArtistBackfillStatus>
+      flash={flash}
+      icon={Users}
+      title={t('settings.cardArtistCredits')}
+      description={t('settings.artistBackfillDescription')}
+      actionLabel={t('settings.backfillArtists')}
+      confirmTitle={t('settings.scanLibraryForArtistCredits')}
+      startedMessage={t('settings.artistBackfillStarted')}
+      load={api.artistBackfillStatus}
+      start={api.startArtistBackfill}
+      stop={api.stopArtistBackfill}
+      badges={(s, finished) => (
+        <>
+          <Badge variant="ok">
+            {finished
+              ? t('settings.lastRunArtistsUpdated', { count: s.updated })
+              : t('settings.artistsUpdatedCount', { count: s.updated })}
+          </Badge>
+          <Badge>{t('settings.alreadyCorrectCount', { count: s.skipped })}</Badge>
           <Badge variant="warn">{t('settings.unmatchedCount', { count: s.noMatch })}</Badge>
           {s.failed > 0 && <Badge variant="bad">{t('settings.failedCount', { count: s.failed })}</Badge>}
         </>

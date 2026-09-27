@@ -213,7 +213,15 @@
     "lyricsAddedCount": "{{count}}개 추가됨",
     "lastRunLyricsAdded": "마지막 실행: {{count}}개 추가됨",
     "alreadyHaveLyricsCount": "{{count}}개는 이미 가사 있음",
-    "noAppleLyricsCount": "{{count}}개는 Apple에 가사 없음"
+    "noAppleLyricsCount": "{{count}}개는 Apple에 가사 없음",
+    "cardArtistCredits": "아티스트 크레딧",
+    "artistBackfillDescription": "여러 아티스트의 곡은 \"Charli xcx & Billie Eilish\"처럼 하나로 합친 이름으로 태그되어 미디어 서버에서 별도의 아티스트로 표시됩니다. Apple Music의 아티스트와 작곡가를 각각 별도 태그(ARTISTS, COMPOSER, ALBUMARTISTS)로 쓰고 표시 이름은 유지합니다. 새 다운로드에는 자동으로 적용됩니다. 끝나면 Navidrome 전체 스캔을 실행해 합쳐진 아티스트를 없앱니다.",
+    "backfillArtists": "아티스트 크레딧 수정",
+    "scanLibraryForArtistCredits": "라이브러리 전체의 아티스트 크레딧을 다시 쓸까요?",
+    "artistBackfillStarted": "아티스트 크레딧 수정을 시작했습니다",
+    "artistsUpdatedCount": "{{count}}개 업데이트됨",
+    "lastRunArtistsUpdated": "마지막 실행: {{count}}개 업데이트됨",
+    "alreadyCorrectCount": "{{count}}개는 이미 올바름"
   },
   "album": {
     "loadError": "불러오지 못했습니다",

@@ -213,7 +213,15 @@
     "lyricsAddedCount": "{{count}} 件追加",
     "lastRunLyricsAdded": "前回の実行: {{count}} 件追加",
     "alreadyHaveLyricsCount": "{{count}} 件は歌詞あり",
-    "noAppleLyricsCount": "{{count}} 件は Apple に歌詞なし"
+    "noAppleLyricsCount": "{{count}} 件は Apple に歌詞なし",
+    "cardArtistCredits": "アーティストのクレジット",
+    "artistBackfillDescription": "複数アーティストの曲は「Charli xcx & Billie Eilish」のような結合名でタグ付けされ、メディアサーバーでは別のアーティストとして表示されます。Apple Music の各アーティストと作曲者を個別のタグ（ARTISTS、COMPOSER、ALBUMARTISTS）に書き込み、表示名はそのまま残します。新しいダウンロードには自動で適用されます。完了後に Navidrome のフルスキャンを実行し、結合されたアーティストを消します。",
+    "backfillArtists": "アーティストのクレジットを修正",
+    "scanLibraryForArtistCredits": "ライブラリ全体のアーティストのクレジットを書き直しますか？",
+    "artistBackfillStarted": "アーティストのクレジット修正を開始しました",
+    "artistsUpdatedCount": "{{count}} 件更新",
+    "lastRunArtistsUpdated": "前回の実行: {{count}} 件更新",
+    "alreadyCorrectCount": "{{count}} 件は修正不要"
   },
   "album": {
     "loadError": "読み込みに失敗しました",

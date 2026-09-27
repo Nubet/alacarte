@@ -213,7 +213,15 @@
     "lyricsAddedCount": "已新增 {{count}} 首",
     "lastRunLyricsAdded": "上次執行：已新增 {{count}} 首",
     "alreadyHaveLyricsCount": "{{count}} 首已有歌詞",
-    "noAppleLyricsCount": "{{count}} 首在 Apple 上沒有歌詞"
+    "noAppleLyricsCount": "{{count}} 首在 Apple 上沒有歌詞",
+    "cardArtistCredits": "藝人署名",
+    "artistBackfillDescription": "多位藝人的歌曲會被標記為一個合併的名稱，例如「Charli xcx & Billie Eilish」，媒體伺服器會把它當作獨立的藝人。此功能會把 Apple Music 中的每位藝人和作曲者分別寫入標籤（ARTISTS、COMPOSER、ALBUMARTISTS），並保留顯示名稱。新下載會自動處理。完成後會執行一次 Navidrome 完整掃描，合併的藝人隨之消失。",
+    "backfillArtists": "修正藝人署名",
+    "scanLibraryForArtistCredits": "要重寫資料庫中的藝人署名嗎？",
+    "artistBackfillStarted": "藝人署名修正已開始",
+    "artistsUpdatedCount": "已更新 {{count}} 首",
+    "lastRunArtistsUpdated": "上次執行：已更新 {{count}} 首",
+    "alreadyCorrectCount": "{{count}} 首已正確"
   },
   "album": {
     "loadError": "載入失敗",
