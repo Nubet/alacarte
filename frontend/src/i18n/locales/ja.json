@@ -204,7 +204,16 @@
     "hideToken": "トークンを隠す",
     "showToken": "トークンを表示",
     "copyToken": "トークンをコピー",
-    "regenerateToken": "トークンを再発行"
+    "regenerateToken": "トークンを再発行",
+    "cardLyrics": "歌詞",
+    "lyricsBackfillDescription": "歌詞ファイルがまだないトラック（media-user-token を設定する前にダウンロードしたものなど）の歌詞を Apple Music から取得します。既存の歌詞ファイルは置き換えません。media-user-token と ISRC タグが必要です（一致なしと表示される場合は先にタグの補完を実行してください）。",
+    "backfillLyrics": "不足している歌詞を取得",
+    "scanLibraryForMissingLyrics": "歌詞のないトラックをライブラリでスキャンしますか？",
+    "lyricsBackfillStarted": "歌詞の補完を開始しました",
+    "lyricsAddedCount": "{{count}} 件追加",
+    "lastRunLyricsAdded": "前回の実行: {{count}} 件追加",
+    "alreadyHaveLyricsCount": "{{count}} 件は歌詞あり",
+    "noAppleLyricsCount": "{{count}} 件は Apple に歌詞なし"
   },
   "album": {
     "loadError": "読み込みに失敗しました",

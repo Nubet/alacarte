@@ -9,6 +9,7 @@ import {
   Globe,
   FolderOpen,
   ListPlus,
+  MicVocal,
   Plug,
   Radar,
   ShieldCheck,
@@ -18,7 +19,13 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
-import { api, type EffectiveCheckInterval, type PublicSettings, type TagBackfillStatus } from '../api/client'
+import {
+  api,
+  type EffectiveCheckInterval,
+  type LyricsBackfillStatus,
+  type PublicSettings,
+  type TagBackfillStatus,
+} from '../api/client'
 import { setAppSettingsCache } from '../hooks/useAppSettings'
 import { useEventStream } from '../hooks/useEventStream'
 import i18n, { SUPPORTED_LANGUAGES, LANGUAGE_NATIVE_LABELS } from '../i18n'
@@ -534,6 +541,10 @@ export function SettingsPage() {
 
         <StaggeredItem>
           <TagBackfillCard flash={flash} />
+        </StaggeredItem>
+
+        <StaggeredItem>
+          <LyricsBackfillCard flash={flash} />
         </StaggeredItem>
 
         <StaggeredItem>
@@ -1572,16 +1583,49 @@ function HintSlot({ hint }: { hint: { tone: HintTone; text: string } | null }) {
   )
 }
 
-function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
+type BackfillStatusBase = {
+  running: boolean
+  scanned: number
+  total: number
+  current: string | null
+  finishedAt: number | null
+  stopRequested: boolean
+}
+
+function BackfillCard<S extends BackfillStatusBase>({
+  flash,
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  confirmTitle,
+  startedMessage,
+  load,
+  start: startRun,
+  stop: stopRun,
+  badges,
+}: {
+  flash: (msg: string) => void
+  icon: typeof Tags
+  title: string
+  description: string
+  actionLabel: string
+  confirmTitle: string
+  startedMessage: string
+  load: () => Promise<S>
+  start: () => Promise<S>
+  stop: () => Promise<unknown>
+  badges: (status: S, finished: boolean) => React.ReactNode
+}) {
   const { t } = useTranslation()
-  const [status, setStatus] = useState<TagBackfillStatus | null>(null)
+  const [status, setStatus] = useState<S | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(() => {
-    api.tagBackfillStatus().then(setStatus).catch(() => {})
-  }, [])
+    load().then(setStatus).catch(() => {})
+  }, [load])
 
   useEffect(() => {
     refresh()
@@ -1597,9 +1641,9 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
     setBusy(true)
     setError(null)
     try {
-      setStatus(await api.startTagBackfill(false))
+      setStatus(await startRun())
       setConfirmOpen(false)
-      flash(t('settings.tagBackfillStarted'))
+      flash(startedMessage)
     } catch (err: any) {
       setError(err?.message || t('settings.failedToStartBackfill'))
       setConfirmOpen(false)
@@ -1611,7 +1655,7 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
   const stop = async () => {
     setBusy(true)
     try {
-      await api.stopTagBackfill()
+      await stopRun()
     } catch {}
     setBusy(false)
     refresh()
@@ -1624,11 +1668,9 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
       : 0
 
   return (
-    <SettingsCard icon={<Tags className="h-4 w-4" />} title={t('settings.cardLibraryTags')}>
+    <SettingsCard icon={<Icon className="h-4 w-4" />} title={title}>
       <div className="space-y-4">
-        <div className="text-sm text-white/55">
-          {t('settings.libraryTagsDescription')}
-        </div>
+        <div className="text-sm text-white/55">{description}</div>
 
         {running && (
           <div className="space-y-2">
@@ -1636,14 +1678,7 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
               value={pct}
               label={t('settings.backfillProgress', { pct, scanned: status!.scanned, total: status!.total })}
             />
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="ok">{t('settings.stampedCount', { count: status!.stamped })}</Badge>
-              <Badge>{t('settings.alreadyTaggedCount', { count: status!.skipped })}</Badge>
-              <Badge variant="warn">{t('settings.unmatchedCount', { count: status!.noMatch })}</Badge>
-              {status!.failed > 0 && (
-                <Badge variant="bad">{t('settings.failedCount', { count: status!.failed })}</Badge>
-              )}
-            </div>
+            <div className="flex flex-wrap gap-1.5">{badges(status!, false)}</div>
             {status!.current && (
               <div
                 className="truncate text-xs text-white/40"
@@ -1661,12 +1696,7 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
         )}
 
         {!running && status?.finishedAt && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Badge variant="ok">{t('settings.lastRunStamped', { count: status.stamped })}</Badge>
-            <Badge>{t('settings.alreadyTaggedCount', { count: status.skipped })}</Badge>
-            <Badge variant="warn">{t('settings.unmatchedCount', { count: status.noMatch })}</Badge>
-            {status.failed > 0 && <Badge variant="bad">{t('settings.failedCount', { count: status.failed })}</Badge>}
-          </div>
+          <div className="flex flex-wrap items-center gap-1.5">{badges(status, true)}</div>
         )}
 
         {error && <Badge variant="bad">{error}</Badge>}
@@ -1682,8 +1712,8 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
             </Button>
           ) : (
             <Button onClick={() => setConfirmOpen(true)}>
-              <Tags className="h-4 w-4" />
-              {t('settings.backfillLibraryTags')}
+              <Icon className="h-4 w-4" />
+              {actionLabel}
             </Button>
           )}
         </div>
@@ -1692,21 +1722,21 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        label={t('settings.backfillLibraryTags')}
+        label={actionLabel}
         placement="center"
         className="!max-w-[36rem]"
       >
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgba(var(--accent),0.25)] bg-[rgba(var(--accent),0.12)] text-[rgb(var(--accent))]">
-              <Tags className="h-5 w-5" />
+              <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-wider text-white/55">
-                {t('settings.backfillLibraryTags')}
+                {actionLabel}
               </div>
               <h2 className="mt-1 text-lg font-semibold text-white">
-                {t('settings.scanLibraryForMissingTags')}
+                {confirmTitle}
               </h2>
             </div>
           </div>
@@ -1719,12 +1749,73 @@ function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
               {t('settings.cancel')}
             </Button>
             <Button onClick={start} disabled={busy}>
-              <Tags className="h-4 w-4" />
+              <Icon className="h-4 w-4" />
               {busy ? t('settings.starting') : t('settings.startBackfill')}
             </Button>
           </div>
         </div>
       </Modal>
     </SettingsCard>
+  )
+}
+
+function TagBackfillCard({ flash }: { flash: (msg: string) => void }) {
+  const { t } = useTranslation()
+  return (
+    <BackfillCard<TagBackfillStatus>
+      flash={flash}
+      icon={Tags}
+      title={t('settings.cardLibraryTags')}
+      description={t('settings.libraryTagsDescription')}
+      actionLabel={t('settings.backfillLibraryTags')}
+      confirmTitle={t('settings.scanLibraryForMissingTags')}
+      startedMessage={t('settings.tagBackfillStarted')}
+      load={api.tagBackfillStatus}
+      start={() => api.startTagBackfill(false)}
+      stop={api.stopTagBackfill}
+      badges={(s, finished) => (
+        <>
+          <Badge variant="ok">
+            {finished
+              ? t('settings.lastRunStamped', { count: s.stamped })
+              : t('settings.stampedCount', { count: s.stamped })}
+          </Badge>
+          <Badge>{t('settings.alreadyTaggedCount', { count: s.skipped })}</Badge>
+          <Badge variant="warn">{t('settings.unmatchedCount', { count: s.noMatch })}</Badge>
+          {s.failed > 0 && <Badge variant="bad">{t('settings.failedCount', { count: s.failed })}</Badge>}
+        </>
+      )}
+    />
+  )
+}
+
+function LyricsBackfillCard({ flash }: { flash: (msg: string) => void }) {
+  const { t } = useTranslation()
+  return (
+    <BackfillCard<LyricsBackfillStatus>
+      flash={flash}
+      icon={MicVocal}
+      title={t('settings.cardLyrics')}
+      description={t('settings.lyricsBackfillDescription')}
+      actionLabel={t('settings.backfillLyrics')}
+      confirmTitle={t('settings.scanLibraryForMissingLyrics')}
+      startedMessage={t('settings.lyricsBackfillStarted')}
+      load={api.lyricsBackfillStatus}
+      start={api.startLyricsBackfill}
+      stop={api.stopLyricsBackfill}
+      badges={(s, finished) => (
+        <>
+          <Badge variant="ok">
+            {finished
+              ? t('settings.lastRunLyricsAdded', { count: s.added })
+              : t('settings.lyricsAddedCount', { count: s.added })}
+          </Badge>
+          <Badge>{t('settings.alreadyHaveLyricsCount', { count: s.skipped })}</Badge>
+          <Badge>{t('settings.noAppleLyricsCount', { count: s.noLyrics })}</Badge>
+          <Badge variant="warn">{t('settings.unmatchedCount', { count: s.noMatch })}</Badge>
+          {s.failed > 0 && <Badge variant="bad">{t('settings.failedCount', { count: s.failed })}</Badge>}
+        </>
+      )}
+    />
   )
 }

@@ -204,7 +204,16 @@
     "hideToken": "토큰 숨기기",
     "showToken": "토큰 표시",
     "copyToken": "토큰 복사",
-    "regenerateToken": "토큰 재발급"
+    "regenerateToken": "토큰 재발급",
+    "cardLyrics": "가사",
+    "lyricsBackfillDescription": "아직 가사 파일이 없는 트랙(예: media-user-token 설정 전에 다운로드한 트랙)의 가사를 Apple Music에서 가져옵니다. 기존 가사 파일은 바꾸지 않습니다. media-user-token과 ISRC 태그가 필요합니다(일치 없음으로 표시되면 먼저 태그 보완을 실행하세요).",
+    "backfillLyrics": "누락된 가사 가져오기",
+    "scanLibraryForMissingLyrics": "가사가 없는 트랙을 라이브러리에서 검색할까요?",
+    "lyricsBackfillStarted": "가사 보완을 시작했습니다",
+    "lyricsAddedCount": "{{count}}개 추가됨",
+    "lastRunLyricsAdded": "마지막 실행: {{count}}개 추가됨",
+    "alreadyHaveLyricsCount": "{{count}}개는 이미 가사 있음",
+    "noAppleLyricsCount": "{{count}}개는 Apple에 가사 없음"
   },
   "album": {
     "loadError": "불러오지 못했습니다",

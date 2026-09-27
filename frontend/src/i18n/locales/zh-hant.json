@@ -204,7 +204,16 @@
     "hideToken": "隱藏權杖",
     "showToken": "顯示權杖",
     "copyToken": "複製權杖",
-    "regenerateToken": "重新產生權杖"
+    "regenerateToken": "重新產生權杖",
+    "cardLyrics": "歌詞",
+    "lyricsBackfillDescription": "為尚未有歌詞檔案的曲目從 Apple Music 取得歌詞，例如設定 media-user-token 之前下載的曲目。現有的歌詞檔案不會被取代。需要 media-user-token 和 ISRC 標籤（如果曲目顯示為未匹配，請先執行標籤補全）。",
+    "backfillLyrics": "取得缺少的歌詞",
+    "scanLibraryForMissingLyrics": "掃描資料庫中沒有歌詞的曲目？",
+    "lyricsBackfillStarted": "歌詞補全已開始",
+    "lyricsAddedCount": "已新增 {{count}} 首",
+    "lastRunLyricsAdded": "上次執行：已新增 {{count}} 首",
+    "alreadyHaveLyricsCount": "{{count}} 首已有歌詞",
+    "noAppleLyricsCount": "{{count}} 首在 Apple 上沒有歌詞"
   },
   "album": {
     "loadError": "載入失敗",

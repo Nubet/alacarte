@@ -404,6 +404,22 @@ export type TagBackfillStatus = {
   error: string | null
 }
 
+export type LyricsBackfillStatus = {
+  running: boolean
+  scanned: number
+  total: number
+  added: number
+  skipped: number
+  noLyrics: number
+  noMatch: number
+  failed: number
+  current: string | null
+  startedAt: number | null
+  finishedAt: number | null
+  stopRequested: boolean
+  error: string | null
+}
+
 type UnauthorizedHandler = (info: { needsSetup: boolean }) => void
 
 let onUnauthorized: UnauthorizedHandler | null = null
@@ -829,6 +845,11 @@ export const api = {
     }),
   stopTagBackfill: () =>
     http<{ ok: boolean }>('/api/settings/tag-backfill/stop', { method: 'POST' }),
+  lyricsBackfillStatus: () => http<LyricsBackfillStatus>('/api/settings/lyrics-backfill'),
+  startLyricsBackfill: () =>
+    http<LyricsBackfillStatus>('/api/settings/lyrics-backfill', { method: 'POST' }),
+  stopLyricsBackfill: () =>
+    http<{ ok: boolean }>('/api/settings/lyrics-backfill/stop', { method: 'POST' }),
 }
 
 export function artworkUrl(

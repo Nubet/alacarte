@@ -204,7 +204,16 @@
     "hideToken": "Hide token",
     "showToken": "Show token",
     "copyToken": "Copy token",
-    "regenerateToken": "Regenerate token"
+    "regenerateToken": "Regenerate token",
+    "cardLyrics": "Lyrics",
+    "lyricsBackfillDescription": "Fetches lyrics from Apple Music for tracks that don't have a lyrics file yet, for example ones downloaded before a media-user-token was set. Existing lyrics files are never replaced. Needs a media-user-token and ISRC tags (run the tag backfill first if tracks show as unmatched).",
+    "backfillLyrics": "Fetch missing lyrics",
+    "scanLibraryForMissingLyrics": "Scan your library for tracks without lyrics?",
+    "lyricsBackfillStarted": "Lyrics backfill started",
+    "lyricsAddedCount": "{{count}} added",
+    "lastRunLyricsAdded": "Last run: {{count}} added",
+    "alreadyHaveLyricsCount": "{{count}} already have lyrics",
+    "noAppleLyricsCount": "{{count}} without lyrics on Apple"
   },
   "album": {
     "loadError": "Failed to load",

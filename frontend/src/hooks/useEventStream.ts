@@ -28,6 +28,7 @@ const EVENT_TYPES = [
   'playlist-following.updated',
   'cloud-library.download-all.progress',
   'tags.backfill.progress',
+  'lyrics.backfill.progress',
   'library.changed',
 ] as const
 

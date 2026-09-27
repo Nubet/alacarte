@@ -204,7 +204,16 @@
     "hideToken": "Ocultar token",
     "showToken": "Mostrar token",
     "copyToken": "Copiar token",
-    "regenerateToken": "Regenerar token"
+    "regenerateToken": "Regenerar token",
+    "cardLyrics": "Letras",
+    "lyricsBackfillDescription": "Obtiene letras de Apple Music para las pistas que aún no tienen archivo de letra, por ejemplo las descargadas antes de configurar un media-user-token. Nunca reemplaza archivos de letra existentes. Requiere un media-user-token y etiquetas ISRC (si las pistas aparecen sin coincidencia, ejecuta primero el completado de etiquetas).",
+    "backfillLyrics": "Obtener letras que faltan",
+    "scanLibraryForMissingLyrics": "¿Buscar en tu biblioteca pistas sin letra?",
+    "lyricsBackfillStarted": "Completado de letras iniciado",
+    "lyricsAddedCount": "{{count}} añadidas",
+    "lastRunLyricsAdded": "Última ejecución: {{count}} añadidas",
+    "alreadyHaveLyricsCount": "{{count}} ya tienen letra",
+    "noAppleLyricsCount": "{{count}} sin letra en Apple"
   },
   "album": {
     "loadError": "Error al cargar",

@@ -204,7 +204,16 @@
     "hideToken": "Masquer le jeton",
     "showToken": "Afficher le jeton",
     "copyToken": "Copier le jeton",
-    "regenerateToken": "Régénérer le jeton"
+    "regenerateToken": "Régénérer le jeton",
+    "cardLyrics": "Paroles",
+    "lyricsBackfillDescription": "Récupère les paroles depuis Apple Music pour les pistes qui n'ont pas encore de fichier de paroles, par exemple celles téléchargées avant la configuration d'un media-user-token. Les fichiers de paroles existants ne sont jamais remplacés. Nécessite un media-user-token et des tags ISRC (lancez d'abord le complément des tags si des pistes apparaissent sans correspondance).",
+    "backfillLyrics": "Récupérer les paroles manquantes",
+    "scanLibraryForMissingLyrics": "Rechercher dans votre bibliothèque les pistes sans paroles ?",
+    "lyricsBackfillStarted": "Complément des paroles lancé",
+    "lyricsAddedCount": "{{count}} ajoutées",
+    "lastRunLyricsAdded": "Dernière exécution : {{count}} ajoutées",
+    "alreadyHaveLyricsCount": "{{count}} ont déjà des paroles",
+    "noAppleLyricsCount": "{{count}} sans paroles sur Apple"
   },
   "album": {
     "loadError": "Échec du chargement",
