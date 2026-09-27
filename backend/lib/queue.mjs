@@ -26,7 +26,9 @@ import {
 } from './flacConvert.mjs'
 import {
   applyNamingConvention,
+  assertFreeSpace,
   assertWritableTarget,
+  estimateJobBytes,
   computeFinalDir,
   ensureDir,
   mergeMove,
@@ -54,6 +56,9 @@ const CONFIG_DIR = process.env.AMDL_CONFIG_DIR || '/config'
 const HISTORY_FILE = path.join(CONFIG_DIR, 'history.ndjson')
 const MAX_CONCURRENT = 1
 const QUALITY_VALUES = new Set(['flac', 'alac', 'atmos', 'aac'])
+// Playlists reuse tracks already in the library, so their full length
+// overstates what gets downloaded.
+const PLAYLIST_SPACE_TRACK_CAP = 30
 const STALL_WARN_MS = Math.max(5_000, Number(process.env.AMDL_STALL_WARN_MS) || 60_000)
 const STALL_TIMEOUT_MS = Math.max(
   STALL_WARN_MS + 5_000,
@@ -1253,6 +1258,16 @@ async function runJob(job) {
       stagingRoot: jobStaging,
     })
     await preflightMusicTarget(settings, job)
+    const tracks = Number(job.stats?.total) || 1
+    await assertFreeSpace({
+      stagingRoot,
+      musicRoot: MUSIC_ROOT,
+      bytes: estimateJobBytes(
+        job.kind === 'playlist' ? Math.min(tracks, PLAYLIST_SPACE_TRACK_CAP) : tracks,
+        quality,
+      ),
+      stagingFactor: quality === 'flac' ? 2 : 1,
+    })
     throwIfCancelled(job)
 
     if (
