@@ -480,6 +480,20 @@ func (s *Supervisor) handleWake(w http.ResponseWriter, r *http.Request) {
 	case s.wake <- struct{}{}:
 	default:
 	}
+	// A wrapper can remain alive while one of its service sockets is wedged
+	// (notably after an Invalid CKC response). In that state StartNormal is a
+	// no-op, so replace the unhealthy process before starting a fresh one.
+	s.mu.Lock()
+	restartRunning := s.mode == ModeNormal && s.normal != nil
+	s.mu.Unlock()
+	if restartRunning {
+		s.stopNormal()
+		s.mu.Lock()
+		if s.mode == ModeNormal {
+			s.mode = ModeIdle
+		}
+		s.mu.Unlock()
+	}
 	s.StartNormal()
 	s.handleHealth(w, r)
 }
