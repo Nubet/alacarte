@@ -324,9 +324,7 @@ function SongRow({ song }: { song: Song }) {
   const {
     ready,
     isSongInLibrary,
-    isAlbumInLibrary,
     verifySongPresence,
-    verifyAlbumPresence,
   } = useLibraryPresence()
   const touchMode = useTouchMode()
   const matching = useMemo(() => {
@@ -339,11 +337,7 @@ function SongRow({ song }: { song: Song }) {
   }, [jobs, song.id])
 
   const canDownload = Boolean(song.albumId)
-  const albumLookup = song.albumName
-    ? { id: song.albumId || '', artistName: song.artistName, name: song.albumName }
-    : null
-  const alreadyInLibrary =
-    isSongInLibrary(song) || (albumLookup ? isAlbumInLibrary(albumLookup) : false)
+  const alreadyInLibrary = isSongInLibrary(song)
 
   return (
     <Card hover className="group relative flex items-center gap-3 p-2">
@@ -403,7 +397,6 @@ function SongRow({ song }: { song: Song }) {
               if (!song.albumId) return false
               if (!ready) {
                 if (await verifySongPresence(song)) return false
-                if (albumLookup && (await verifyAlbumPresence(albumLookup))) return false
               }
               try {
                 const quality = await chooseDownloadQuality()
@@ -413,7 +406,6 @@ function SongRow({ song }: { song: Song }) {
               } catch (err: any) {
                 if (/already in library/i.test(String(err?.message || ''))) {
                   await verifySongPresence(song)
-                  if (albumLookup) await verifyAlbumPresence(albumLookup)
                   return false
                 }
                 throw err

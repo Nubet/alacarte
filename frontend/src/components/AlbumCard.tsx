@@ -17,28 +17,24 @@ import { ResolvedMediaLink } from './ResolvedMediaLink'
 type Props = {
   album: Album
   size?: 'sm' | 'md'
-  alreadyInLibrary?: boolean
 }
 
-export function AlbumCard({ album, size = 'md', alreadyInLibrary = false }: Props) {
+export function AlbumCard({ album, size = 'md' }: Props) {
   const { t } = useTranslation()
   const { jobs } = useQueue()
-  const { ready, isAlbumInLibrary, verifyAlbumPresence, getAlbumTrackPresence } = useLibraryPresence()
+  const { getAlbumLibraryStatus, getAlbumTrackPresence } = useLibraryPresence()
   const touchMode = useTouchMode()
   const appSettings = useAppSettings()
   const { chooseDownloadQuality, qualityPrompt } = useDownloadQualityPrompt()
+  const libraryStatus = getAlbumLibraryStatus(album)
   const showRatingBadge =
     appSettings?.explicitFilter === 'both' &&
     (album.contentRating === 'explicit' || album.contentRating === 'clean')
   const trackPresence = getAlbumTrackPresence(album.id)
-  const partial = Boolean(
-    trackPresence &&
-      trackPresence.expected > 0 &&
-      trackPresence.present > 0 &&
-      trackPresence.present < trackPresence.expected,
-  )
-  const fullByTracks = Boolean(trackPresence?.complete)
-  const blocked = alreadyInLibrary || fullByTracks || (!trackPresence && isAlbumInLibrary(album))
+  const partial = trackPresence
+    ? trackPresence.present > 0 && !trackPresence.complete
+    : libraryStatus.present > 0 && !libraryStatus.complete
+  const blocked = trackPresence?.complete || libraryStatus.complete
   const matching = useMemo(() => {
     const active = jobs.find(
       (j) =>
@@ -90,7 +86,7 @@ export function AlbumCard({ album, size = 'md', alreadyInLibrary = false }: Prop
                   className="rounded bg-amber-400/90 backdrop-blur-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black shadow-sm ring-1 ring-black/10"
                   title={t('albumCard.tracksDownloaded', {
                     present: trackPresence?.present || 0,
-                    expected: trackPresence?.expected || 0,
+                    expected: trackPresence?.expected || libraryStatus.expected,
                   })}
                 >
                   {t('albumCard.partial')}
@@ -119,7 +115,6 @@ export function AlbumCard({ album, size = 'md', alreadyInLibrary = false }: Prop
           <DownloadButton
             job={matching}
             onStart={async () => {
-              if (!ready && (await verifyAlbumPresence(album))) return false
               try {
                 const quality = await chooseDownloadQuality()
                 if (quality === false) return false
@@ -127,7 +122,6 @@ export function AlbumCard({ album, size = 'md', alreadyInLibrary = false }: Prop
                 return true
               } catch (err: any) {
                 if (/already in library/i.test(String(err?.message || ''))) {
-                  await verifyAlbumPresence(album)
                   return false
                 }
                 throw err

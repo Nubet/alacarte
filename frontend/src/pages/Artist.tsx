@@ -52,7 +52,7 @@ export function ArtistPage() {
         useState<QualityPreference>("flac");
     const [followReleaseScope, setFollowReleaseScope] =
         useState<ReleaseScope>("everything");
-    const { isAlbumInLibrary } = useLibraryPresence();
+    const { getAlbumLibraryStatus } = useLibraryPresence();
     const { followingState } = useActivityFeed();
     const appSettings = useAppSettings();
 
@@ -117,9 +117,9 @@ export function ArtistPage() {
     const inLibraryAlbums = useMemo(
         () =>
             Object.fromEntries(
-                albums.map((album) => [album.id, isAlbumInLibrary(album)]),
+                albums.map((album) => [album.id, getAlbumLibraryStatus(album).complete]),
             ),
-        [albums, isAlbumInLibrary],
+        [albums, getAlbumLibraryStatus],
     );
 
     const followArtist = async (downloadNow: boolean) => {

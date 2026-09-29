@@ -47,7 +47,7 @@ export function AlbumPage() {
   const [isMobile, setIsMobile] = useState(false)
   const {
     ready,
-    isAlbumInLibrary,
+    getAlbumLibraryStatus,
     verifyAlbumPresence,
     verifyAlbumTracksPresence,
     getAlbumTrackPresence,
@@ -74,8 +74,8 @@ export function AlbumPage() {
           j.albumId === id &&
           j.kind === 'album' &&
           (j.status === 'queued' || j.status === 'running'),
-      ) || ((album && isAlbumInLibrary(album)) ? jobs.find((j) => j.albumId === id && j.kind === 'album' && j.status === 'done') : undefined),
-    [jobs, id, album, isAlbumInLibrary],
+      ) || ((album && getAlbumLibraryStatus(album).complete) ? jobs.find((j) => j.albumId === id && j.kind === 'album' && j.status === 'done') : undefined),
+    [jobs, id, album, getAlbumLibraryStatus],
   )
 
   useEffect(() => {
@@ -136,7 +136,6 @@ export function AlbumPage() {
     if (!album) return
     setEnqueueing(true)
     try {
-      if (!ready && (await verifyAlbumPresence(album))) return
       const quality = await chooseDownloadQuality()
       if (quality === false) return
       await api.enqueue(album.id, quality)
@@ -154,7 +153,7 @@ export function AlbumPage() {
   const coverBig = artworkUrl(album?.artworkTemplate, 600)
   const bgColor = album?.artworkColor ? `#${album.artworkColor}` : '#1a1a1a'
   const primaryArtistId = album?.artistId || album?.artists?.[0]?.id || null
-  const alreadyInLibrary = allPresent || (!trackPresence && album ? isAlbumInLibrary(album) : false)
+  const alreadyInLibrary = allPresent || (!trackPresence && album ? getAlbumLibraryStatus(album).complete : false)
   const presentGroups = useMemo(
     () => (album && alreadyInLibrary ? getAlbumVersionGroups(album) : []),
     [album, alreadyInLibrary, getAlbumVersionGroups],
@@ -295,7 +294,6 @@ export function AlbumPage() {
                       key={option.group}
                       onClick={() =>
                         onVariantDownload(option.label, async () => {
-                          if (!ready && (await verifyAlbumPresence(album))) return
                           await api.enqueue(album.id, option.quality)
                         })
                       }

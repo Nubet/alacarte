@@ -7,6 +7,7 @@ import {
   CloudDownload,
   Disc3,
   Download,
+  Filter,
   ListMusic,
   Loader2,
   Music2,
@@ -45,6 +46,7 @@ import { cx } from '../lib/cx'
 
 type TabKey = CloudLibraryKind
 type AnyItem = CloudLibraryAlbum | CloudLibraryPlaylist | CloudLibrarySong
+type AlbumStatusFilter = 'all' | 'in-library' | 'partial'
 
 type TabState<T> = {
   items: T[]
@@ -66,6 +68,10 @@ const TAB_KEYS: readonly TabKey[] = ['albums', 'playlists', 'songs']
 
 function isTabKey(value: string | null): value is TabKey {
   return value !== null && (TAB_KEYS as readonly string[]).includes(value)
+}
+
+function isAlbumStatusFilter(value: string | null): value is AlbumStatusFilter {
+  return value === 'all' || value === 'in-library' || value === 'partial'
 }
 
 function emptyTab<T>(): TabState<T> {
@@ -108,6 +114,10 @@ export function CloudLibraryPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tabParam = searchParams.get('tab')
   const activeTab: TabKey = isTabKey(tabParam) ? tabParam : 'albums'
+  const albumStatusParam = searchParams.get('albumStatus')
+  const albumStatus: AlbumStatusFilter = isAlbumStatusFilter(albumStatusParam)
+    ? albumStatusParam
+    : 'all'
   const setActiveTab = useCallback(
     (tab: TabKey) => {
       setSearchParams(
@@ -115,6 +125,20 @@ export function CloudLibraryPage() {
           const next = new URLSearchParams(prev)
           if (tab === 'albums') next.delete('tab')
           else next.set('tab', tab)
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [setSearchParams],
+  )
+  const setAlbumStatus = useCallback(
+    (status: AlbumStatusFilter) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (status === 'all') next.delete('albumStatus')
+          else next.set('albumStatus', status)
           return next
         },
         { replace: true },
@@ -143,6 +167,7 @@ export function CloudLibraryPage() {
     unsupported: number
   } | null>(null)
   const appSettings = useAppSettings()
+  const { getAlbumLibraryStatus } = useLibraryPresence()
   const [bulkQuality, setBulkQuality] = useState<QualityPreference>('flac')
 
   const sentinelRef = useRef<HTMLDivElement | null>(null)
@@ -298,6 +323,24 @@ export function CloudLibraryPage() {
     }
   }
 
+  const activeState = tabs[activeTab]
+  const hasItems = activeState.items.length > 0
+  const visibleItems = useMemo(() => {
+    if (activeTab !== 'albums' || albumStatus === 'all') return activeState.items
+    return (activeState.items as CloudLibraryAlbum[]).filter((album) => {
+      const status = getAlbumLibraryStatus({
+        id: album.catalogId || album.libraryId,
+        name: album.name,
+        artistName: album.artistName,
+        trackCount: album.trackCount,
+      })
+      return albumStatus === 'in-library'
+        ? status.complete
+        : status.present > 0 && !status.complete
+    })
+  }, [activeState.items, activeTab, albumStatus, getAlbumLibraryStatus])
+  const hasVisibleItems = visibleItems.length > 0
+
   if (healthLoading) {
     return (
       <div className="mx-auto w-full max-w-7xl pt-6">
@@ -310,8 +353,6 @@ export function CloudLibraryPage() {
     return <NotConnectedScreen reason={health?.reason} error={health?.error} onRetry={checkHealth} />
   }
 
-  const activeState = tabs[activeTab]
-  const hasItems = activeState.items.length > 0
   const neverFetched =
     activeState.total === null && activeState.items.length === 0 && !activeState.error
   const showSkeleton = (activeState.loading || neverFetched) && !hasItems
@@ -416,6 +457,30 @@ export function CloudLibraryPage() {
         />
       </div>
 
+      {activeTab === 'albums' && (
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('cloudLibrary.albumStatusFilterLabel')}>
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-white/45">
+            <Filter className="h-3.5 w-3.5" />
+            {t('cloudLibrary.albumStatusFilterLabel')}
+          </span>
+          <CatPill
+            label={t('cloudLibrary.albumStatusAll')}
+            active={albumStatus === 'all'}
+            onClick={() => setAlbumStatus('all')}
+          />
+          <CatPill
+            label={t('cloudLibrary.albumStatusInLibrary')}
+            active={albumStatus === 'in-library'}
+            onClick={() => setAlbumStatus('in-library')}
+          />
+          <CatPill
+            label={t('cloudLibrary.albumStatusPartial')}
+            active={albumStatus === 'partial'}
+            onClick={() => setAlbumStatus('partial')}
+          />
+        </div>
+      )}
+
       {activeState.error && <Badge variant="bad">{activeState.error}</Badge>}
 
       {showSkeleton ? (
@@ -433,12 +498,16 @@ export function CloudLibraryPage() {
             </p>
           </div>
         </Card>
+      ) : !hasVisibleItems && activeTab === 'albums' ? (
+        <Card className="p-8 text-sm text-white/60">
+          {t('cloudLibrary.noAlbumsMatchStatus')}
+        </Card>
       ) : activeTab === 'albums' ? (
-        <AlbumGrid items={tabs.albums.items} />
+        <AlbumGrid items={visibleItems as CloudLibraryAlbum[]} />
       ) : activeTab === 'playlists' ? (
-        <PlaylistGrid items={tabs.playlists.items} />
+        <PlaylistGrid items={visibleItems as CloudLibraryPlaylist[]} />
       ) : (
-        <SongList items={tabs.songs.items} />
+        <SongList items={visibleItems as CloudLibrarySong[]} />
       )}
 
       <div ref={sentinelRef} className="h-8 w-full" aria-hidden />
@@ -563,7 +632,7 @@ function CatPill({
   count,
 }: {
   label: string
-  icon: React.ComponentType<{ className?: string }>
+  icon?: React.ComponentType<{ className?: string }>
   active: boolean
   onClick: () => void
   count?: number | null
@@ -578,7 +647,7 @@ function CatPill({
         active && '!border-accent/50 !bg-accent/22 !text-white',
       )}
     >
-      <Icon className="h-3.5 w-3.5" />
+      {Icon && <Icon className="h-3.5 w-3.5" />}
       {label}
       {typeof count === 'number' && count > 0 && (
         <span className="text-white/50 text-[11px] font-normal">{count}</span>
@@ -650,9 +719,14 @@ function AlbumGrid({ items }: { items: CloudLibraryAlbum[] }) {
 
 function CloudAlbumTile({ item }: { item: CloudLibraryAlbum }) {
   const { t } = useTranslation()
-  const { isAlbumInLibrary } = useLibraryPresence()
-  const localAlbum = { id: item.catalogId || item.libraryId, name: item.name, artistName: item.artistName }
-  const alreadyInLibrary = isAlbumInLibrary(localAlbum)
+  const { getAlbumLibraryStatus } = useLibraryPresence()
+  const albumLookup = {
+    id: item.catalogId || item.libraryId,
+    name: item.name,
+    artistName: item.artistName,
+    trackCount: item.trackCount,
+  }
+  const alreadyInLibrary = getAlbumLibraryStatus(albumLookup).complete
 
   if (!item.catalogId) {
     return (
@@ -675,7 +749,7 @@ function CloudAlbumTile({ item }: { item: CloudLibraryAlbum }) {
     trackCount: item.trackCount,
   }
 
-  return <AlbumCard album={album} alreadyInLibrary={alreadyInLibrary} />
+  return <AlbumCard album={album} />
 }
 
 function PlaylistGrid({ items }: { items: CloudLibraryPlaylist[] }) {
@@ -724,7 +798,7 @@ function CloudSongRow({ song }: { song: CloudLibrarySong }) {
   const { t } = useTranslation()
   const { jobs } = useQueue()
   const { chooseDownloadQuality, qualityPrompt } = useDownloadQualityPrompt()
-  const { isAlbumInLibrary, isSongInLibrary, verifySongPresence, verifyAlbumPresence, ready } =
+  const { isSongInLibrary, verifySongPresence, ready } =
     useLibraryPresence()
   const matching = useMemo(() => {
     if (!song.catalogId) return null
@@ -757,11 +831,7 @@ function CloudSongRow({ song }: { song: CloudLibrarySong }) {
     artistName: song.artistName,
     albumName: song.albumName,
   }
-  const albumLookup = song.albumName
-    ? { id: albumCatalog || '', artistName: song.artistName, name: song.albumName }
-    : null
-  const alreadyInLibrary =
-    isSongInLibrary(songLookup) || (albumLookup ? isAlbumInLibrary(albumLookup) : false)
+  const alreadyInLibrary = isSongInLibrary(songLookup)
 
   return (
     <Card hover className="group relative flex items-center gap-3 p-2">
@@ -801,7 +871,6 @@ function CloudSongRow({ song }: { song: CloudLibrarySong }) {
             onStart={async () => {
               if (!ready) {
                 if (await verifySongPresence(songLookup)) return false
-                if (albumLookup && (await verifyAlbumPresence(albumLookup))) return false
               }
               try {
                 const quality = await chooseDownloadQuality()

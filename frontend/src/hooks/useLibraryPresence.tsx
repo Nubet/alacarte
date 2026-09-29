@@ -20,7 +20,7 @@ import { isAlbumKeyVariantMatch, makeAlbumMatchKey, makeSongMatchKey } from '../
 import type { QualityGroup } from '../api/client'
 import { useEventStream } from './useEventStream'
 
-type AlbumLookup = Pick<Album, 'id' | 'artistName' | 'name'> & {
+type AlbumLookup = Pick<Album, 'id' | 'artistName' | 'name' | 'trackCount'> & {
   albumName?: string | null
   upc?: string | null
 }
@@ -38,6 +38,12 @@ export type AlbumTrackPresence = {
   tracks: Record<string, boolean>
 }
 
+export type AlbumLibraryStatus = {
+  present: number
+  expected: number
+  complete: boolean
+}
+
 type AlbumTracksLookup = {
   id: string
   artistName: string
@@ -48,7 +54,7 @@ type AlbumTracksLookup = {
 type LibraryPresenceContextValue = {
   loading: boolean
   ready: boolean
-  isAlbumInLibrary: (album: AlbumLookup | null | undefined) => boolean
+  getAlbumLibraryStatus: (album: AlbumLookup | null | undefined) => AlbumLibraryStatus
   isSongInLibrary: (song: SongLookup | null | undefined) => boolean
   isPlaylistInLibrary: (playlist: PlaylistLookup | null | undefined) => boolean
   verifyAlbumPresence: (album: AlbumLookup | null | undefined, force?: boolean) => Promise<boolean>
@@ -71,6 +77,7 @@ type PresenceSnapshot = {
   upcs: Record<string, true>
   albumVariants: Record<string, QualityGroup[]>
   albumTrackPresence: Record<string, AlbumTrackPresence>
+  albumTrackCounts: Record<string, number>
 }
 
 const LibraryPresenceContext = createContext<LibraryPresenceContextValue | null>(null)
@@ -94,6 +101,7 @@ export function LibraryPresenceProvider({ children }: { children: React.ReactNod
     upcs: {},
     albumVariants: {},
     albumTrackPresence: {},
+    albumTrackCounts: {},
   })
   const [loading, setLoading] = useState(true)
   const [ready, setReady] = useState(false)
@@ -163,17 +171,19 @@ export function LibraryPresenceProvider({ children }: { children: React.ReactNod
     }, 250)
   })
 
-  const isAlbumInLibrary = useCallback(
-    (album: AlbumLookup | null | undefined) => {
-      const upc = normalizeUpcClient(album?.upc)
-      if (upc && snapshot.upcs[upc]) return true
+  const getAlbumLibraryStatus = useCallback(
+    (album: AlbumLookup | null | undefined): AlbumLibraryStatus => {
+      const expected = Math.max(0, Number(album?.trackCount) || 0)
       const key = makeAlbumKey(album)
-      if (!key) return false
-      if (snapshot.albumKeys[key]) return true
-      // multi-artist releases are often imported under a shorter artist folder
-      return isAlbumKeyVariantMatch(Object.keys(snapshot.albumKeys), key)
+      if (!key || expected === 0) return { present: 0, expected, complete: false }
+
+      const counts = Object.entries(snapshot.albumTrackCounts)
+        .filter(([existingKey]) => existingKey === key || isAlbumKeyVariantMatch([existingKey], key))
+        .map(([, count]) => count)
+      const present = Math.max(0, ...counts)
+      return { present, expected, complete: present >= expected }
     },
-    [snapshot.albumKeys, snapshot.upcs],
+    [snapshot.albumTrackCounts],
   )
 
   const isSongInLibrary = useCallback(
@@ -362,7 +372,7 @@ export function LibraryPresenceProvider({ children }: { children: React.ReactNod
     () => ({
       loading,
       ready,
-      isAlbumInLibrary,
+      getAlbumLibraryStatus,
       isSongInLibrary,
       isPlaylistInLibrary,
       verifyAlbumPresence,
@@ -374,7 +384,7 @@ export function LibraryPresenceProvider({ children }: { children: React.ReactNod
       refreshLibraryPresence,
     }),
     [
-      isAlbumInLibrary,
+      getAlbumLibraryStatus,
       isSongInLibrary,
       isPlaylistInLibrary,
       loading,
@@ -415,6 +425,7 @@ function buildSnapshot(
   albumVariantsArr: Array<[string, QualityGroup[]]> = [],
 ): PresenceSnapshot {
   const albumKeys: Record<string, true> = {}
+  const albumTrackCounts: Record<string, number> = {}
   const songKeys: Record<string, true> = {}
   const playlistIds: Record<string, true> = {}
   const isrcs: Record<string, true> = {}
@@ -424,12 +435,14 @@ function buildSnapshot(
     if (key) albumKeys[String(key)] = true
   }
 
-  // Fallback if older server omitted albumKeys
-  if (albumKeysArr.length === 0) {
-    for (const album of albums) {
-      const key = makeAlbumKey(album)
-      if (key) albumKeys[key] = true
-    }
+  for (const album of albums) {
+    const key = makeAlbumKey(album)
+    if (!key) continue
+    if (albumKeysArr.length === 0) albumKeys[key] = true
+    albumTrackCounts[key] = Math.max(
+      albumTrackCounts[key] || 0,
+      Number(album.trackCount) || 0,
+    )
   }
 
   for (const single of singles) {
@@ -468,6 +481,7 @@ function buildSnapshot(
     upcs,
     albumVariants,
     albumTrackPresence: {},
+    albumTrackCounts,
   }
 }
 
